@@ -167,6 +167,24 @@ class HttpFacility extends Base {
     return this.request(path, { ...opts, method: 'delete' }, cb)
   }
 
+  async options (path, opts = {}, cb = null) {
+    if (_.isFunction(opts)) {
+      cb = opts
+      opts = {}
+    }
+
+    return this.request(path, { ...opts, method: 'options' }, cb)
+  }
+
+  async head (path, opts = {}, cb = null) {
+    if (_.isFunction(opts)) {
+      cb = opts
+      opts = {}
+    }
+
+    return this.request(path, { ...opts, method: 'head' }, cb)
+  }
+
   _response (err, res, cb) {
     if (_.isFunction(cb)) return cb(err, res)
 

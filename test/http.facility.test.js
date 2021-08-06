@@ -554,4 +554,60 @@ describe('http facility tests', () => {
       expect(body).to.be.deep.equal({})
     })
   })
+
+  describe('head tests', () => {
+    it('should perform requests as expected', async () => {
+      const resp = await fac.head('/get_test', { headers: { foo: 'bar' } })
+      expect(resp.get('content-type')).to.be.equal('text/html; charset=utf-8')
+    })
+
+    it('should support callbacks', (done) => {
+      fac.head('/get_test', { headers: { foo: 'bar' } }, (err, res) => {
+        expect(err).to.be.null()
+        expect(res.get('content-type')).to.be.equal('text/html; charset=utf-8')
+        done()
+      })
+    })
+
+    it('should support callback as 2nd arg', (done) => {
+      fac.head('/get_test', (err, res) => {
+        expect(err).to.be.null()
+        expect(res.get('content-type')).to.be.equal('text/html; charset=utf-8')
+        done()
+      })
+    })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.head('/get_test')
+      expect(resp.get('content-type')).to.be.equal('text/html; charset=utf-8')
+    })
+  })
+
+  describe('options tests', () => {
+    it('should perform requests as expected', async () => {
+      const resp = await fac.options('/get_test', { headers: { foo: 'bar' } })
+      expect(resp.get('allow')).to.be.equal('GET,HEAD')
+    })
+
+    it('should support callbacks', (done) => {
+      fac.options('/get_test', { headers: { foo: 'bar' } }, (err, res) => {
+        expect(err).to.be.null()
+        expect(res.get('allow')).to.be.equal('GET,HEAD')
+        done()
+      })
+    })
+
+    it('should support callback as 2nd arg', (done) => {
+      fac.options('/get_test', (err, res) => {
+        expect(err).to.be.null()
+        expect(res.get('allow')).to.be.equal('GET,HEAD')
+        done()
+      })
+    })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.options('/get_test')
+      expect(resp.get('allow')).to.be.equal('GET,HEAD')
+    })
+  })
 })
