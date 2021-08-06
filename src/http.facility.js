@@ -107,6 +107,9 @@ class HttpFacility extends Base {
           case 'text':
             respBody = await resp.text()
             break
+          case 'raw':
+            respBody = resp.body
+            break
           default:
             respBody = await resp.buffer()
             break

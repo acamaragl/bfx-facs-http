@@ -8,3 +8,4 @@ package-lock.json
 *.swo
 .nyc_output
 coverage
+test/out.png

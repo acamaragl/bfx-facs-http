@@ -3,13 +3,16 @@
 'use strict'
 
 const chai = require('chai')
+const endOfStream = require('end-of-stream')
 const express = require('express')
+const fs = require('fs')
 const http = require('http')
 const HttpFacility = require('../')
 const sinon = require('sinon')
 const { expect } = chai.use(require('dirty-chai'))
   .use(require('chai-as-promised'))
 const { format } = require('util')
+const { join } = require('path')
 
 describe('http facility tests', () => {
   let srv = null
@@ -318,6 +321,30 @@ describe('http facility tests', () => {
     it('should support options method', async () => {
       const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
       expect(resp.allow).to.include('GET')
+    })
+
+    it('should support streams', async () => {
+      const readfile = join(__dirname, 'bfx.png')
+      const writefile = join(__dirname, 'out.png')
+
+      app.get('/file', (req, res) => {
+        res.setHeader('content-disposition', 'attachment; filename=bfx.png')
+        res.setHeader('content-type', 'image/png')
+
+        const stream = fs.createReadStream(readfile)
+        stream.pipe(res)
+      })
+
+      if (fs.existsSync(writefile)) fs.unlinkSync(writefile)
+
+      const resp = await fac.request('/file', { encoding: { res: 'raw' } })
+      await new Promise((resolve, reject) => {
+        const writer = fs.createWriteStream(writefile)
+        endOfStream(writer, (err) => err ? reject(err) : resolve())
+        resp.pipe(writer)
+      })
+
+      expect(fs.existsSync(writefile)).to.be.true()
     })
   })
 
