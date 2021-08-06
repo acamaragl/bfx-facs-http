@@ -36,19 +36,6 @@ class HttpFacility extends Base {
     ], cb)
   }
 
-  /**
-   * @param {string} path
-   * @param {Object} [opts]
-   * @param {string|object} [opts.body]
-   * @param {Object<string, string>} [opts.headers]
-   * @param {'get'|'head'|'post'|'put'|'delete'|'options'|'patch'} [opts.method]
-   * @param {boolean} [opts.redirect]
-   * @param {http.Agent} [opts.agent]
-   * @param {boolean} [opts.compress]
-   * @param {number} [opts.timeout]
-   * @param {string|{ req?: string, res?: string }} [opts.encoding]
-   * @param {Function} [cb]
-   */
   async request (path, opts = {}, cb = null) {
     try {
       if (_.isFunction(opts)) {
