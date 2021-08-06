@@ -106,6 +106,7 @@ class HttpFacility extends Base {
         }
       } catch (err) {
         if (this.debug) console.error(new Date().toISOString(), err)
+        if (!httpErr) return this._response(err, null, cb)
       }
 
       if (httpErr && respBody) httpErr.response = respBody

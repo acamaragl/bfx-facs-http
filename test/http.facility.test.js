@@ -6,8 +6,10 @@ const chai = require('chai')
 const express = require('express')
 const http = require('http')
 const HttpFacility = require('../')
+const sinon = require('sinon')
 const { expect } = chai.use(require('dirty-chai'))
   .use(require('chai-as-promised'))
+const { format } = require('util')
 
 describe('http facility tests', () => {
   let srv = null
@@ -33,6 +35,17 @@ describe('http facility tests', () => {
 
   afterEach(() => {
     fac.baseUrl = 'http://127.0.0.1:7070'
+  })
+
+  describe('constructor tests', () => {
+    it('should set base url to empty string when missing', (done) => {
+      const fac = new HttpFacility({}, {}, { env: 'test' })
+
+      fac.start(() => {
+        expect(fac.baseUrl).to.be.equal('')
+        done()
+      })
+    })
   })
 
   describe('_response tests', () => {
@@ -64,7 +77,7 @@ describe('http facility tests', () => {
     })
 
     it('should throw error on invalid url', async () => {
-      fac.baseUrl = null
+      fac.baseUrl = ''
 
       await expect(
         fac.request('foo/bar')
@@ -175,6 +188,21 @@ describe('http facility tests', () => {
       expect(body).to.be.deep.equal({ data: 'test' })
     })
 
+    it('should return text encoding by default on request body', async () => {
+      const reqOpts = {
+        method: 'post',
+        body: JSON.stringify({ data: 'test' }),
+        headers: { 'content-type': 'application/json' },
+        encoding: {
+          res: 'json'
+        }
+      }
+      const resp = await fac.request('/foo/bar/4', reqOpts)
+
+      expect(resp).to.be.deep.equal({ success: true })
+      expect(body).to.be.deep.equal({ data: 'test' })
+    })
+
     it('should use buffer encoding on response when response type is not supported', async () => {
       app.post('/foo/bar/7', (req, res) => {
         body = req.body
@@ -249,6 +277,38 @@ describe('http facility tests', () => {
       const resp = await fac.request('/foo/bar/3', { method: 'get', agent })
       expect(resp).to.be.equal('test')
     })
+
+    it('should support timeout', async () => {
+      await expect(
+        fac.request('/foo/bar/3', { method: 'get', timeout: 1 })
+      ).to.be.rejectedWith('network timeout at: http://127.0.0.1:7070/foo/bar/3')
+    })
+
+    it('should throw error when encoding is wrong', async () => {
+      await expect(
+        fac.request('/foo/bar/3', { method: 'get', encoding: 'json' })
+      ).to.be.rejectedWith('invalid json response body')
+    })
+
+    it('should support debugging', async () => {
+      let log = null
+      const logStub = sinon.stub(console, 'error').callsFake((...params) => {
+        log = format(...params)
+      })
+      fac.debug = true
+
+      app.get('/foo/bar/8', (req, res) => {
+        res.status(500).send('test')
+      })
+
+      await expect(
+        fac.request('/foo/bar/8', { method: 'get', encoding: 'json' })
+      ).to.be.rejectedWith('ERR_HTTP: 500 - Internal Server Error')
+      expect(log).to.contain('invalid json response body')
+
+      logStub.reset()
+      fac.debug = false
+    })
   })
 
   describe('get tests', () => {
@@ -277,6 +337,11 @@ describe('http facility tests', () => {
         expect(res).to.be.equal('test')
         done()
       })
+    })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.get('/get_test')
+      expect(resp).to.be.equal('test')
     })
   })
 
@@ -322,6 +387,12 @@ describe('http facility tests', () => {
         done()
       })
     })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.post('/post_test')
+      expect(resp).to.be.equal('bar')
+      expect(body).to.be.deep.equal({})
+    })
   })
 
   describe('put tests', () => {
@@ -365,6 +436,12 @@ describe('http facility tests', () => {
         expect(body).to.be.deep.equal({})
         done()
       })
+    })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.put('/put_test')
+      expect(resp).to.be.equal('bar')
+      expect(body).to.be.deep.equal({})
     })
   })
 
@@ -410,6 +487,12 @@ describe('http facility tests', () => {
         done()
       })
     })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.patch('/patch_test')
+      expect(resp).to.be.equal('bar')
+      expect(body).to.be.deep.equal({})
+    })
   })
 
   describe('delete tests', () => {
@@ -453,6 +536,12 @@ describe('http facility tests', () => {
         expect(body).to.be.deep.equal({})
         done()
       })
+    })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.delete('/delete_test')
+      expect(resp).to.be.equal('bar')
+      expect(body).to.be.deep.equal({})
     })
   })
 })

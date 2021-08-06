@@ -6,3 +6,5 @@ sec
 package-lock.json
 *.swp
 *.swo
+.nyc_output
+coverage
