@@ -312,12 +312,12 @@ describe('http facility tests', () => {
 
     it('should support head method', async () => {
       const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'head' })
-      expect(resp.get('content-type')).to.contain('application/json')
+      expect(resp['content-type']).to.contain('application/json')
     })
 
     it('should support options method', async () => {
       const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
-      expect(resp.get('allow')).to.include('GET')
+      expect(resp.allow).to.include('GET')
     })
   })
 
@@ -558,13 +558,13 @@ describe('http facility tests', () => {
   describe('head tests', () => {
     it('should perform requests as expected', async () => {
       const resp = await fac.head('/get_test', { headers: { foo: 'bar' } })
-      expect(resp.get('content-type')).to.be.equal('text/html; charset=utf-8')
+      expect(resp['content-type']).to.be.equal('text/html; charset=utf-8')
     })
 
     it('should support callbacks', (done) => {
       fac.head('/get_test', { headers: { foo: 'bar' } }, (err, res) => {
         expect(err).to.be.null()
-        expect(res.get('content-type')).to.be.equal('text/html; charset=utf-8')
+        expect(res['content-type']).to.be.equal('text/html; charset=utf-8')
         done()
       })
     })
@@ -572,27 +572,27 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.head('/get_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res.get('content-type')).to.be.equal('text/html; charset=utf-8')
+        expect(res['content-type']).to.be.equal('text/html; charset=utf-8')
         done()
       })
     })
 
     it('should work without optional args', async () => {
       const resp = await fac.head('/get_test')
-      expect(resp.get('content-type')).to.be.equal('text/html; charset=utf-8')
+      expect(resp['content-type']).to.be.equal('text/html; charset=utf-8')
     })
   })
 
   describe('options tests', () => {
     it('should perform requests as expected', async () => {
       const resp = await fac.options('/get_test', { headers: { foo: 'bar' } })
-      expect(resp.get('allow')).to.be.equal('GET,HEAD')
+      expect(resp.allow).to.be.equal('GET,HEAD')
     })
 
     it('should support callbacks', (done) => {
       fac.options('/get_test', { headers: { foo: 'bar' } }, (err, res) => {
         expect(err).to.be.null()
-        expect(res.get('allow')).to.be.equal('GET,HEAD')
+        expect(res.allow).to.be.equal('GET,HEAD')
         done()
       })
     })
@@ -600,14 +600,14 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.options('/get_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res.get('allow')).to.be.equal('GET,HEAD')
+        expect(res.allow).to.be.equal('GET,HEAD')
         done()
       })
     })
 
     it('should work without optional args', async () => {
       const resp = await fac.options('/get_test')
-      expect(resp.get('allow')).to.be.equal('GET,HEAD')
+      expect(resp.allow).to.be.equal('GET,HEAD')
     })
   })
 })

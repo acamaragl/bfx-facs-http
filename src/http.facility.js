@@ -93,7 +93,9 @@ class HttpFacility extends Base {
       }
 
       if (reqOpts.method === 'head' || reqOpts.method === 'options') {
-        respBody = resp.headers
+        respBody = _.mapValues(resp.headers.raw(), (v) => {
+          return v.length === 1 ? v[0] : v
+        })
         return this._response(httpErr, respBody, cb)
       }
 
