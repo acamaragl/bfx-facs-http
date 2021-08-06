@@ -24,9 +24,10 @@ Params:
                                      Default encoding is text for both request and response
       - `req<String?>` - Optional request body encoding, supported: `json` and `text`. 
                          If no value is provided it will be treated as text
-      - `res<String?>` - Optional response body encoding, supported: `json` and `text`. 
+      - `res<String?>` - Optional response body encoding, supported: `json`, `text` and `raw`. 
                          If no value is provided it will be treated as text,
-                         if unsupported value is provided it will return buffer
+                         if unsupported value is provided it will return buffer.
+                         If value is `raw` then body stream is returned, useful for file downloads
   - `cb<Function?>` - Optional callback function, if not provided call will be treated as promise
 
 Response:
