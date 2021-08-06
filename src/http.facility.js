@@ -101,7 +101,7 @@ class HttpFacility extends Base {
             respBody = await resp.text()
             break
           default:
-            respBody = Buffer.from(await resp.arrayBuffer())
+            respBody = await resp.buffer()
             break
         }
       } catch (err) {
