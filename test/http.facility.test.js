@@ -309,6 +309,16 @@ describe('http facility tests', () => {
       logStub.reset()
       fac.debug = false
     })
+
+    it('should support head method', async () => {
+      const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'head' })
+      expect(resp.get('content-type')).to.contain('application/json')
+    })
+
+    it('should support options method', async () => {
+      const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
+      expect(resp.get('allow')).to.include('GET')
+    })
   })
 
   describe('get tests', () => {

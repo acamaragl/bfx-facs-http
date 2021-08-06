@@ -92,6 +92,11 @@ class HttpFacility extends Base {
         httpErr.statusText = resp.statusText
       }
 
+      if (reqOpts.method === 'head' || reqOpts.method === 'options') {
+        respBody = resp.headers
+        return this._response(httpErr, respBody, cb)
+      }
+
       try {
         switch (resEnc) {
           case 'json':
