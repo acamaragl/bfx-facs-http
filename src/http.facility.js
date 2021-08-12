@@ -72,45 +72,44 @@ class HttpFacility extends Base {
       let httpErr = null
       const resp = await fetch(url, reqOpts)
       let respBody = null
+      const headers = _.mapValues(resp.headers.raw(), (v) => {
+        return v.length === 1 ? v[0] : v
+      })
 
       if (!resp.ok) {
         httpErr = new Error(`ERR_HTTP: ${resp.status} - ${resp.statusText}`)
         httpErr.status = resp.status
         httpErr.statusText = resp.statusText
+        httpErr.headers = headers
       }
 
-      if (reqOpts.method === 'head' || reqOpts.method === 'options') {
-        respBody = _.mapValues(resp.headers.raw(), (v) => {
-          return v.length === 1 ? v[0] : v
-        })
-        return this._response(httpErr, respBody, cb)
-      }
-
-      try {
-        switch (resEnc) {
-          case 'json':
-            respBody = await resp.json()
-            break
-          case 'text':
-            respBody = await resp.text()
-            break
-          case 'raw':
-            respBody = resp.body
-            break
-          default:
-            respBody = await resp.buffer()
-            break
+      if (reqOpts.method !== 'head' && reqOpts.method !== 'options') {
+        try {
+          switch (resEnc) {
+            case 'json':
+              respBody = await resp.json()
+              break
+            case 'text':
+              respBody = await resp.text()
+              break
+            case 'raw':
+              respBody = resp.body
+              break
+            default:
+              respBody = await resp.buffer()
+              break
+          }
+        } catch (err) {
+          if (this.debug) console.error(new Date().toISOString(), err)
+          if (!httpErr) return this._response(err, null, headers, cb)
         }
-      } catch (err) {
-        if (this.debug) console.error(new Date().toISOString(), err)
-        if (!httpErr) return this._response(err, null, cb)
       }
 
       if (httpErr && respBody) httpErr.response = respBody
 
-      return this._response(httpErr, respBody, cb)
+      return this._response(httpErr, respBody, headers, cb)
     } catch (err) {
-      return this._response(err, null, cb)
+      return this._response(err, null, {}, cb)
     }
   }
 
@@ -151,7 +150,8 @@ class HttpFacility extends Base {
     return this.request(path, { ...opts, method }, cb)
   }
 
-  _response (err, res, cb) {
+  _response (err, respBody, headers, cb) {
+    const res = { body: respBody, headers }
     if (_.isFunction(cb)) return cb(err, res)
 
     if (err) return Promise.reject(err)

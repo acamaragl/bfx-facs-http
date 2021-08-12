@@ -53,22 +53,22 @@ describe('http facility tests', () => {
 
   describe('_response tests', () => {
     it('should perform call callback when provided', (done) => {
-      fac._response(null, 123, (err, res) => {
+      fac._response(null, 123, {}, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal(123)
+        expect(res).to.be.deep.equal({ body: 123, headers: {} })
         done()
       })
     })
 
     it('should reject promise when no callback is provided and error is present', async () => {
       await expect(
-        fac._response(new Error('FOO'), 123)
+        fac._response(new Error('FOO'), 123, {})
       ).to.be.rejectedWith('FOO')
     })
 
     it('should resolve promise when no callback is provided and error is falsy', async () => {
-      const res = await fac._response(null, 123)
-      expect(res).to.be.equal(123)
+      const res = await fac._response(null, 123, {})
+      expect(res).to.be.deep.equal({ body: 123, headers: {} })
     })
   })
 
@@ -110,6 +110,7 @@ describe('http facility tests', () => {
       expect(httpErr.status).to.be.equal(500)
       expect(httpErr.statusText).to.be.equal('Internal Server Error')
       expect(httpErr.response).to.be.equal('{"auth":false}')
+      expect(httpErr.headers).to.be.an('object')
     })
 
     it('should support paths when base url is set', async () => {
@@ -117,7 +118,7 @@ describe('http facility tests', () => {
         res.send('test')
       })
 
-      const resp = await fac.request('foo/bar/2', { method: 'get' })
+      const { body: resp } = await fac.request('foo/bar/2', { method: 'get' })
       expect(resp).to.be.equal('test')
     })
 
@@ -126,12 +127,12 @@ describe('http facility tests', () => {
         res.send('test')
       })
 
-      const resp = await fac.request('/foo/bar/3', { method: 'get' })
+      const { body: resp } = await fac.request('/foo/bar/3', { method: 'get' })
       expect(resp).to.be.equal('test')
     })
 
     it('should ignore base url when path is full url', async () => {
-      const resp = await fac.request('https://www.google.com', { method: 'get' })
+      const { body: resp } = await fac.request('https://www.google.com', { method: 'get' })
       expect(resp).to.be.include('<html')
     })
 
@@ -146,7 +147,7 @@ describe('http facility tests', () => {
         body: { data: 'test' },
         encoding: 'json'
       }
-      const resp = await fac.request('/foo/bar/4', reqOpts)
+      const { body: resp } = await fac.request('/foo/bar/4', reqOpts)
 
       expect(resp).to.be.deep.equal({ success: true })
       expect(body).to.be.deep.equal({ data: 'test' })
@@ -166,7 +167,7 @@ describe('http facility tests', () => {
           res: 'text'
         }
       }
-      const resp = await fac.request('/foo/bar/5', reqOpts)
+      const { body: resp } = await fac.request('/foo/bar/5', reqOpts)
 
       expect(resp).to.be.deep.equal('test')
       expect(body).to.be.deep.equal({ data: 'test' })
@@ -185,7 +186,7 @@ describe('http facility tests', () => {
           req: 'json'
         }
       }
-      const resp = await fac.request('/foo/bar/6', reqOpts)
+      const { body: resp } = await fac.request('/foo/bar/6', reqOpts)
 
       expect(resp).to.be.deep.equal('<test />')
       expect(body).to.be.deep.equal({ data: 'test' })
@@ -200,7 +201,7 @@ describe('http facility tests', () => {
           res: 'json'
         }
       }
-      const resp = await fac.request('/foo/bar/4', reqOpts)
+      const { body: resp } = await fac.request('/foo/bar/4', reqOpts)
 
       expect(resp).to.be.deep.equal({ success: true })
       expect(body).to.be.deep.equal({ data: 'test' })
@@ -220,7 +221,7 @@ describe('http facility tests', () => {
           res: 'xml'
         }
       }
-      const resp = await fac.request('/foo/bar/7', reqOpts)
+      const { body: resp } = await fac.request('/foo/bar/7', reqOpts)
 
       expect(resp).to.be.instanceOf(Buffer)
       expect(resp.toString('utf-8')).to.be.deep.equal('<test />')
@@ -230,7 +231,7 @@ describe('http facility tests', () => {
     it('should support callbacks', (done) => {
       fac.request('/foo/bar/3', { method: 'get' }, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('test')
+        expect(res.body).to.be.equal('test')
         done()
       })
     })
@@ -242,6 +243,7 @@ describe('http facility tests', () => {
         expect(err.status).to.be.equal(500)
         expect(err.statusText).to.be.equal('Internal Server Error')
         expect(err.response).to.be.equal('{"auth":false}')
+        expect(err.headers).to.be.be.an('object')
         done()
       })
     })
@@ -249,7 +251,7 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.request('/foo/bar/3', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('test')
+        expect(res.body).to.be.equal('test')
         done()
       })
     })
@@ -260,14 +262,14 @@ describe('http facility tests', () => {
         body: JSON.stringify({ data: 'test' }),
         headers: { 'content-type': 'application/json' }
       }
-      const resp = await fac.request('/foo/bar/4', reqOpts)
+      const { body: resp } = await fac.request('/foo/bar/4', reqOpts)
 
       expect(resp).to.be.deep.equal('{"success":true}')
       expect(body).to.be.deep.equal({ data: 'test' })
     })
 
     it('should support redirect', async () => {
-      const resp = await fac.request('http://google.com', { method: 'get', redirect: true })
+      const { body: resp } = await fac.request('http://google.com', { method: 'get', redirect: true })
       expect(resp).to.be.include('<html')
 
       await expect(
@@ -277,7 +279,7 @@ describe('http facility tests', () => {
 
     it('should support user agents', async () => {
       const agent = new http.Agent({ keepAlive: false })
-      const resp = await fac.request('/foo/bar/3', { method: 'get', agent })
+      const { body: resp } = await fac.request('/foo/bar/3', { method: 'get', agent })
       expect(resp).to.be.equal('test')
     })
 
@@ -314,13 +316,13 @@ describe('http facility tests', () => {
     })
 
     it('should support head method', async () => {
-      const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'head' })
-      expect(resp['content-type']).to.contain('application/json')
+      const { headers } = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'head' })
+      expect(headers['content-type']).to.contain('application/json')
     })
 
     it('should support options method', async () => {
-      const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
-      expect(resp.allow).to.include('GET')
+      const { headers } = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
+      expect(headers.allow).to.include('GET')
     })
 
     it('should support streams', async () => {
@@ -337,7 +339,7 @@ describe('http facility tests', () => {
 
       if (fs.existsSync(writefile)) fs.unlinkSync(writefile)
 
-      const resp = await fac.request('/file', { encoding: { res: 'raw' } })
+      const { body: resp } = await fac.request('/file', { encoding: { res: 'raw' } })
       await new Promise((resolve, reject) => {
         const writer = fs.createWriteStream(writefile)
         endOfStream(writer, (err) => err ? reject(err) : resolve())
@@ -356,14 +358,14 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac._methodRequest('/method_request_test', 'get', { method: 'post' })
+      const { body: resp } = await fac._methodRequest('/method_request_test', 'get', { method: 'post' })
       expect(resp).to.be.equal('foo')
     })
 
     it('should support callbacks', (done) => {
       fac._methodRequest('/method_request_test', 'get', { method: 'post' }, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('foo')
+        expect(res.body).to.be.equal('foo')
         done()
       })
     })
@@ -371,13 +373,13 @@ describe('http facility tests', () => {
     it('should support callback as 3nd arg', (done) => {
       fac._methodRequest('/method_request_test', 'get', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('foo')
+        expect(res.body).to.be.equal('foo')
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac._methodRequest('/method_request_test', 'get')
+      const { body: resp } = await fac._methodRequest('/method_request_test', 'get')
       expect(resp).to.be.equal('foo')
     })
   })
@@ -390,14 +392,14 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac.get('/get_test', { method: 'post' })
+      const { body: resp } = await fac.get('/get_test', { method: 'post' })
       expect(resp).to.be.equal('test')
     })
 
     it('should support callbacks', (done) => {
       fac.get('/get_test', { method: 'post' }, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('test')
+        expect(res.body).to.be.equal('test')
         done()
       })
     })
@@ -405,13 +407,13 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.get('/get_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('test')
+        expect(res.body).to.be.equal('test')
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.get('/get_test')
+      const { body: resp } = await fac.get('/get_test')
       expect(resp).to.be.equal('test')
     })
   })
@@ -436,7 +438,7 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac.post('/post_test', reqOpts)
+      const { body: resp } = await fac.post('/post_test', reqOpts)
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({ foo: 'bar' })
     })
@@ -444,7 +446,7 @@ describe('http facility tests', () => {
     it('should support callbacks', (done) => {
       fac.post('/post_test', reqOpts, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({ foo: 'bar' })
         done()
       })
@@ -453,14 +455,14 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.post('/post_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({})
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.post('/post_test')
+      const { body: resp } = await fac.post('/post_test')
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({})
     })
@@ -486,7 +488,7 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac.put('/put_test', reqOpts)
+      const { body: resp } = await fac.put('/put_test', reqOpts)
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({ foo: 'bar' })
     })
@@ -494,7 +496,7 @@ describe('http facility tests', () => {
     it('should support callbacks', (done) => {
       fac.put('/put_test', reqOpts, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({ foo: 'bar' })
         done()
       })
@@ -503,14 +505,14 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.put('/put_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({})
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.put('/put_test')
+      const { body: resp } = await fac.put('/put_test')
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({})
     })
@@ -536,7 +538,7 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac.patch('/patch_test', reqOpts)
+      const { body: resp } = await fac.patch('/patch_test', reqOpts)
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({ foo: 'bar' })
     })
@@ -544,7 +546,7 @@ describe('http facility tests', () => {
     it('should support callbacks', (done) => {
       fac.patch('/patch_test', reqOpts, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({ foo: 'bar' })
         done()
       })
@@ -553,14 +555,14 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.patch('/patch_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({})
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.patch('/patch_test')
+      const { body: resp } = await fac.patch('/patch_test')
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({})
     })
@@ -586,7 +588,7 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac.delete('/delete_test', reqOpts)
+      const { body: resp } = await fac.delete('/delete_test', reqOpts)
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({ foo: 'bar' })
     })
@@ -594,7 +596,7 @@ describe('http facility tests', () => {
     it('should support callbacks', (done) => {
       fac.delete('/delete_test', reqOpts, (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({ foo: 'bar' })
         done()
       })
@@ -603,14 +605,14 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.delete('/delete_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res).to.be.equal('bar')
+        expect(res.body).to.be.equal('bar')
         expect(body).to.be.deep.equal({})
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.delete('/delete_test')
+      const { body: resp } = await fac.delete('/delete_test')
       expect(resp).to.be.equal('bar')
       expect(body).to.be.deep.equal({})
     })
@@ -618,14 +620,14 @@ describe('http facility tests', () => {
 
   describe('head tests', () => {
     it('should perform requests as expected', async () => {
-      const resp = await fac.head('/get_test', { headers: { foo: 'bar' } })
-      expect(resp['content-type']).to.be.equal('text/html; charset=utf-8')
+      const { headers } = await fac.head('/get_test', { headers: { foo: 'bar' } })
+      expect(headers['content-type']).to.be.equal('text/html; charset=utf-8')
     })
 
     it('should support callbacks', (done) => {
       fac.head('/get_test', { headers: { foo: 'bar' } }, (err, res) => {
         expect(err).to.be.null()
-        expect(res['content-type']).to.be.equal('text/html; charset=utf-8')
+        expect(res.headers['content-type']).to.be.equal('text/html; charset=utf-8')
         done()
       })
     })
@@ -633,27 +635,27 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.head('/get_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res['content-type']).to.be.equal('text/html; charset=utf-8')
+        expect(res.headers['content-type']).to.be.equal('text/html; charset=utf-8')
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.head('/get_test')
-      expect(resp['content-type']).to.be.equal('text/html; charset=utf-8')
+      const { headers } = await fac.head('/get_test')
+      expect(headers['content-type']).to.be.equal('text/html; charset=utf-8')
     })
   })
 
   describe('options tests', () => {
     it('should perform requests as expected', async () => {
-      const resp = await fac.options('/get_test', { headers: { foo: 'bar' } })
-      expect(resp.allow).to.be.equal('GET,HEAD')
+      const { headers } = await fac.options('/get_test', { headers: { foo: 'bar' } })
+      expect(headers.allow).to.be.equal('GET,HEAD')
     })
 
     it('should support callbacks', (done) => {
       fac.options('/get_test', { headers: { foo: 'bar' } }, (err, res) => {
         expect(err).to.be.null()
-        expect(res.allow).to.be.equal('GET,HEAD')
+        expect(res.headers.allow).to.be.equal('GET,HEAD')
         done()
       })
     })
@@ -661,14 +663,14 @@ describe('http facility tests', () => {
     it('should support callback as 2nd arg', (done) => {
       fac.options('/get_test', (err, res) => {
         expect(err).to.be.null()
-        expect(res.allow).to.be.equal('GET,HEAD')
+        expect(res.headers.allow).to.be.equal('GET,HEAD')
         done()
       })
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.options('/get_test')
-      expect(resp.allow).to.be.equal('GET,HEAD')
+      const { headers } = await fac.options('/get_test')
+      expect(headers.allow).to.be.equal('GET,HEAD')
     })
   })
 })
