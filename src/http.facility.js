@@ -114,41 +114,41 @@ class HttpFacility extends Base {
     }
   }
 
-  async methodRequest (path, method, opts = {}, cb = null) {
+  async get (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'get', opts, cb)
+  }
+
+  async post (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'post', opts, cb)
+  }
+
+  async patch (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'patch', opts, cb)
+  }
+
+  async put (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'put', opts, cb)
+  }
+
+  async delete (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'delete', opts, cb)
+  }
+
+  async options (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'options', opts, cb)
+  }
+
+  async head (path, opts = {}, cb = null) {
+    return this._methodRequest(path, 'head', opts, cb)
+  }
+
+  async _methodRequest (path, method, opts = {}, cb = null) {
     if (_.isFunction(opts)) {
       cb = opts
       opts = {}
     }
 
     return this.request(path, { ...opts, method }, cb)
-  }
-
-  async get (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'get', opts, cb)
-  }
-
-  async post (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'post', opts, cb)
-  }
-
-  async patch (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'patch', opts, cb)
-  }
-
-  async put (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'put', opts, cb)
-  }
-
-  async delete (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'delete', opts, cb)
-  }
-
-  async options (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'options', opts, cb)
-  }
-
-  async head (path, opts = {}, cb = null) {
-    return this.methodRequest(path, 'head', opts, cb)
   }
 
   _response (err, res, cb) {

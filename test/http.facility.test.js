@@ -348,7 +348,7 @@ describe('http facility tests', () => {
     })
   })
 
-  describe('methodRequest tests', () => {
+  describe('_methodRequest tests', () => {
     before(() => {
       app.get('/method_request_test', (req, res) => {
         res.send('foo')
@@ -356,12 +356,12 @@ describe('http facility tests', () => {
     })
 
     it('should perform requests as expected', async () => {
-      const resp = await fac.methodRequest('/method_request_test', 'get', { method: 'post' })
+      const resp = await fac._methodRequest('/method_request_test', 'get', { method: 'post' })
       expect(resp).to.be.equal('foo')
     })
 
     it('should support callbacks', (done) => {
-      fac.methodRequest('/method_request_test', 'get', { method: 'post' }, (err, res) => {
+      fac._methodRequest('/method_request_test', 'get', { method: 'post' }, (err, res) => {
         expect(err).to.be.null()
         expect(res).to.be.equal('foo')
         done()
@@ -369,7 +369,7 @@ describe('http facility tests', () => {
     })
 
     it('should support callback as 3nd arg', (done) => {
-      fac.methodRequest('/method_request_test', 'get', (err, res) => {
+      fac._methodRequest('/method_request_test', 'get', (err, res) => {
         expect(err).to.be.null()
         expect(res).to.be.equal('foo')
         done()
@@ -377,7 +377,7 @@ describe('http facility tests', () => {
     })
 
     it('should work without optional args', async () => {
-      const resp = await fac.methodRequest('/method_request_test', 'get')
+      const resp = await fac._methodRequest('/method_request_test', 'get')
       expect(resp).to.be.equal('foo')
     })
   })
