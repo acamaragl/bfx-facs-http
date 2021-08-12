@@ -348,6 +348,40 @@ describe('http facility tests', () => {
     })
   })
 
+  describe('methodRequest tests', () => {
+    before(() => {
+      app.get('/method_request_test', (req, res) => {
+        res.send('foo')
+      })
+    })
+
+    it('should perform requests as expected', async () => {
+      const resp = await fac.methodRequest('/method_request_test', 'get', { method: 'post' })
+      expect(resp).to.be.equal('foo')
+    })
+
+    it('should support callbacks', (done) => {
+      fac.methodRequest('/method_request_test', 'get', { method: 'post' }, (err, res) => {
+        expect(err).to.be.null()
+        expect(res).to.be.equal('foo')
+        done()
+      })
+    })
+
+    it('should support callback as 3nd arg', (done) => {
+      fac.methodRequest('/method_request_test', 'get', (err, res) => {
+        expect(err).to.be.null()
+        expect(res).to.be.equal('foo')
+        done()
+      })
+    })
+
+    it('should work without optional args', async () => {
+      const resp = await fac.methodRequest('/method_request_test', 'get')
+      expect(resp).to.be.equal('foo')
+    })
+  })
+
   describe('get tests', () => {
     before(() => {
       app.get('/get_test', (req, res) => {

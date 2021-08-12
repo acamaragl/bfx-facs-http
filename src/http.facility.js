@@ -114,67 +114,41 @@ class HttpFacility extends Base {
     }
   }
 
-  async get (path, opts = {}, cb = null) {
+  async methodRequest (path, method, opts = {}, cb = null) {
     if (_.isFunction(opts)) {
       cb = opts
       opts = {}
     }
 
-    return this.request(path, { ...opts, method: 'get' }, cb)
+    return this.request(path, { ...opts, method }, cb)
+  }
+
+  async get (path, opts = {}, cb = null) {
+    return this.methodRequest(path, 'get', opts, cb)
   }
 
   async post (path, opts = {}, cb = null) {
-    if (_.isFunction(opts)) {
-      cb = opts
-      opts = {}
-    }
-
-    return this.request(path, { ...opts, method: 'post' }, cb)
+    return this.methodRequest(path, 'post', opts, cb)
   }
 
   async patch (path, opts = {}, cb = null) {
-    if (_.isFunction(opts)) {
-      cb = opts
-      opts = {}
-    }
-
-    return this.request(path, { ...opts, method: 'patch' }, cb)
+    return this.methodRequest(path, 'patch', opts, cb)
   }
 
   async put (path, opts = {}, cb = null) {
-    if (_.isFunction(opts)) {
-      cb = opts
-      opts = {}
-    }
-
-    return this.request(path, { ...opts, method: 'put' }, cb)
+    return this.methodRequest(path, 'put', opts, cb)
   }
 
   async delete (path, opts = {}, cb = null) {
-    if (_.isFunction(opts)) {
-      cb = opts
-      opts = {}
-    }
-
-    return this.request(path, { ...opts, method: 'delete' }, cb)
+    return this.methodRequest(path, 'delete', opts, cb)
   }
 
   async options (path, opts = {}, cb = null) {
-    if (_.isFunction(opts)) {
-      cb = opts
-      opts = {}
-    }
-
-    return this.request(path, { ...opts, method: 'options' }, cb)
+    return this.methodRequest(path, 'options', opts, cb)
   }
 
   async head (path, opts = {}, cb = null) {
-    if (_.isFunction(opts)) {
-      cb = opts
-      opts = {}
-    }
-
-    return this.request(path, { ...opts, method: 'head' }, cb)
+    return this.methodRequest(path, 'head', opts, cb)
   }
 
   _response (err, res, cb) {
