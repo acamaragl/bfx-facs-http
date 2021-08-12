@@ -19,7 +19,7 @@ class HttpFacility extends Base {
       next => { super._start(next) },
       next => {
         this.baseUrl = (this.opts.baseUrl || '').replace(/\/$/, '')
-        this.timeout = this.opts.timeout || 3000
+        this.timeout = this.opts.timeout || 0 // nodejs default timeout
         this.debug = !!this.opts.debug
         next()
       }
