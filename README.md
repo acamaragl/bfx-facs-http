@@ -31,19 +31,18 @@ Params:
   - `cb<Function?>` - Optional callback function, if not provided call will be treated as promise
 
 Response:
-  - `Promise<any>|void` - Server response, promise or callback result
+  - `Promise<{ body: any, headers: object }>|void` - Server response, promise or callback result
 
 Examples:
 ```js
 // GET
-await fac.request('https://example.com')
+const { body, headers } = await fac.request('https://example.com')
 
 // POST
-await fac.request('https://example.com/submit', { method: 'post', body: { foo: 'bar' }, encoding: 'json' })
+const { body, headers } = await fac.request('https://example.com/submit', { method: 'post', body: { foo: 'bar' }, encoding: 'json' })
 
 // OPTIONS
-const resp = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
-resp.get('allow') // GET, PUT, POST 
+const { headers } = await fac.request('https://api-pub.bitfinex.com/v2/conf/pub:list:currency', { method: 'options' })
 
 // Callback
 fac.request(
@@ -69,7 +68,7 @@ fac.request('/data/store', (err) => {
 // file download
 const eos = require('end-of-stream')
 
-const resp = await fac.request('/file', { encoding: { res: 'raw' } }) // raw means return stream
+const { body: resp } = await fac.request('/file', { encoding: { res: 'raw' } }) // raw means return stream
 await new Promise((resolve, reject) => {
   const writer = fs.createWriteStream(writefile)
   eos(writer, (err) => err ? reject(err) : resolve())
@@ -195,7 +194,7 @@ Response:
 
 Example:
 ```js
-const headers = await fac.head('https://api-pub.bitfinex.com/v2/conf/pub:list:currency')
+const { headers } = await fac.head('https://api-pub.bitfinex.com/v2/conf/pub:list:currency')
 console.log(headers['content-type']) // 'application/json; charset=utf-8'
 ```
 
@@ -211,6 +210,6 @@ Response:
 
 Example:
 ```js
-const headers = await fac.head('https://api-pub.bitfinex.com/v2/conf/pub:list:currency')
+const { headers } = await fac.head('https://api-pub.bitfinex.com/v2/conf/pub:list:currency')
 console.log(headers['allow']) // 'GET,PUT,POST'
 ```
