@@ -151,10 +151,8 @@ Response:
 Example:
 ```js
 const reqOpts = {
-  body: JSON.stringify({ a: 1 }),
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  body: { a: 1 },
+  encoding: 'json'
 }
 
 await fac.patch('/data/store', reqOpts)
