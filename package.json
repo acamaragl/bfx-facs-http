@@ -1,0 +1,55 @@
+{
+  "name": "bfx-facs-http",
+  "version": "1.0.0",
+  "description": "Bitfinex HTTP Facility",
+  "author": "vigan.abd",
+  "keywords": [
+    "bitfinex",
+    "http",
+    "facility"
+  ],
+  "scripts": {
+    "coverage": "nyc --reporter=html mocha",
+    "lint": "standard",
+    "format": "standard --fix",
+    "test": "npm run lint && npm run unit",
+    "unit": "NODE_ENV=test mocha ./test"
+  },
+  "dependencies": {
+    "async": "^2.6.3",
+    "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
+    "lodash": "^4.17.21",
+    "node-fetch": "^2.6.1"
+  },
+  "engine": {
+    "node": ">=14.17"
+  },
+  "main": "index.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitfinexcom/bfx-facs-http.git"
+  },
+  "homepage": "https://github.com/bitfinexcom/bfx-facs-http",
+  "maintainers": [
+    {
+      "name": "vigan.abd",
+      "email": "vigan.abdurrahmani@bitfinex.com"
+    },
+    {
+      "name": "prdn",
+      "email": "paolo@bitfinex.com"
+    }
+  ],
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "dirty-chai": "^2.0.1",
+    "end-of-stream": "^1.4.4",
+    "express": "^4.17.1",
+    "mocha": "^9.0.3",
+    "nyc": "^15.1.0",
+    "sinon": "^11.1.2",
+    "standard": "^16.0.3"
+  }
+}
