@@ -363,6 +363,9 @@ describe('http facility tests', () => {
       resp = await fac.request('/foo/bar/9', { method: 'get', encoding: 'json', qs: 'a=1&b=c' })
       expect(resp.body).to.be.deep.equal({ a: '1', b: 'c' })
 
+      resp = await fac.request('/foo/bar/9?', { method: 'get', encoding: 'json', qs: 'a=1&b=c' })
+      expect(resp.body).to.be.deep.equal({ a: '1', b: 'c' })
+
       resp = await fac.request('/foo/bar/9', { method: 'get', encoding: 'json', qs: 123 })
       expect(resp.body).to.be.deep.equal({ 123: '' })
     })
