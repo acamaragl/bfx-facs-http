@@ -28,6 +28,7 @@ Params:
                          If no value is provided it will be treated as text,
                          if unsupported value is provided it will return buffer.
                          If value is `raw` then body stream is returned, useful for file downloads
+    - `qs<(String|Array<String>|Object)?>` - Optional, query string params 
   - `cb<Function?>` - Optional callback function, if not provided call will be treated as promise
 
 Response:

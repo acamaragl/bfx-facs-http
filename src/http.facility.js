@@ -43,11 +43,12 @@ class HttpFacility extends Base {
         opts = {}
       }
 
-      const url = path.includes('://') ? path : `${this.baseUrl}/${path.replace(/^\//, '')}`
+      let url = path.includes('://') ? path : `${this.baseUrl}/${path.replace(/^\//, '')}`
 
-      const reqOpts = _.pick(opts, ['body', 'headers', 'method', 'redirect', 'agent', 'compress', 'timeout'])
+      const reqOpts = _.pick(opts, ['body', 'headers', 'method', 'redirect', 'agent', 'compress', 'timeout', 'qs'])
       if (!reqOpts.method) reqOpts.method = 'get'
       if (!reqOpts.timeout) reqOpts.timeout = this.timeout
+      if (reqOpts.qs) url += (url.includes('?') ? '' : '?') + new URLSearchParams(reqOpts.qs).toString()
       reqOpts.redirect = !reqOpts.redirect ? 'manual' : 'follow'
 
       let reqEnc = 'text'
