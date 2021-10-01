@@ -21,6 +21,7 @@ class HttpFacility extends Base {
         this.baseUrl = (this.opts.baseUrl || '').replace(/\/$/, '')
         this.timeout = this.opts.timeout || 0 // nodejs default timeout
         this.debug = !!this.opts.debug
+        this.qs = this.opts.qs ? new URLSearchParams(this.opts.qs).toString() : ''
         next()
       }
     ], cb)
@@ -45,10 +46,18 @@ class HttpFacility extends Base {
 
       let url = path.includes('://') ? path : `${this.baseUrl}/${path.replace(/^\//, '')}`
 
+      const urlHasQuestion = url.includes('?')
+      if (this.qs) url += (urlHasQuestion ? '' : '?') + this.qs
+
       const reqOpts = _.pick(opts, ['body', 'headers', 'method', 'redirect', 'agent', 'compress', 'timeout', 'qs'])
+      if (reqOpts.qs) {
+        if (!urlHasQuestion) url += '?'
+        if (this.qs) url += '&'
+        url += new URLSearchParams(reqOpts.qs).toString()
+      }
+
       if (!reqOpts.method) reqOpts.method = 'get'
       if (!reqOpts.timeout) reqOpts.timeout = this.timeout
-      if (reqOpts.qs) url += (url.includes('?') ? '' : '?') + new URLSearchParams(reqOpts.qs).toString()
       reqOpts.redirect = !reqOpts.redirect ? 'manual' : 'follow'
 
       let reqEnc = 'text'

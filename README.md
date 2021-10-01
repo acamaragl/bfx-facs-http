@@ -2,6 +2,14 @@
 
 A facility that simplifies making http requests both on promise and callback approaches.
 
+## Config
+
+Fac doesn't support config files but supports the options defined below:
+- `baseUrl<String?>` - Optional base url
+- `timeout<Number?>` - Optional request timeout, default one is node default timeout (0)
+- `debug<(Boolean|Number)?>` - Optional debug flag, default false
+- `qs<(String|Array<String>|Object)?>` - Optional, default query string params 
+
 ## API
 
 ### fac.request

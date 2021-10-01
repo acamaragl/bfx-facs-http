@@ -17,7 +17,7 @@ const { join } = require('path')
 describe('http facility tests', () => {
   let srv = null
   const app = express()
-  const fac = new HttpFacility({}, { baseUrl: 'http://127.0.0.1:7070' }, { env: 'test' })
+  let fac = new HttpFacility({}, { baseUrl: 'http://127.0.0.1:7070' }, { env: 'test' })
 
   before((done) => {
     fac.start((err) => {
@@ -368,6 +368,11 @@ describe('http facility tests', () => {
 
       resp = await fac.request('/foo/bar/9', { method: 'get', encoding: 'json', qs: 123 })
       expect(resp.body).to.be.deep.equal({ 123: '' })
+
+      fac = new HttpFacility({}, { baseUrl: 'http://127.0.0.1:7070', qs: { a: 2, d: 'e' } }, { env: 'test' })
+      await new Promise((resolve, reject) => fac.start((err) => err ? reject(err) : resolve()))
+      resp = await fac.request('/foo/bar/9?', { method: 'get', encoding: 'json', qs: 'a=1&b=c' })
+      expect(resp.body).to.be.deep.equal({ a: ['2', '1'], b: 'c', d: 'e' })
     })
   })
 
