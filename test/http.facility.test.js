@@ -8,6 +8,7 @@ const express = require('express')
 const fs = require('fs')
 const http = require('http')
 const HttpFacility = require('../')
+const { HttpError } = HttpFacility
 const sinon = require('sinon')
 const { expect } = chai.use(require('dirty-chai'))
   .use(require('chai-as-promised'))
@@ -105,7 +106,7 @@ describe('http facility tests', () => {
         httpErr = err
       }
 
-      expect(httpErr).to.be.instanceOf(Error)
+      expect(httpErr).to.be.instanceOf(HttpError)
       expect(httpErr.message).to.be.equal('ERR_HTTP: 500 - Internal Server Error')
       expect(httpErr.status).to.be.equal(500)
       expect(httpErr.statusText).to.be.equal('Internal Server Error')
@@ -238,7 +239,7 @@ describe('http facility tests', () => {
 
     it('should handle errors in callbacks', (done) => {
       fac.request('/foo/bar/1', { method: 'get' }, (err) => {
-        expect(err).to.be.instanceOf(Error)
+        expect(err).to.be.instanceOf(HttpError)
         expect(err.message).to.be.equal('ERR_HTTP: 500 - Internal Server Error')
         expect(err.status).to.be.equal(500)
         expect(err.statusText).to.be.equal('Internal Server Error')

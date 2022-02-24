@@ -4,6 +4,7 @@ const _ = require('lodash')
 const async = require('async')
 const Base = require('bfx-facs-base')
 const fetch = require('node-fetch')
+const HttpError = require('./http.error')
 
 class HttpFacility extends Base {
   constructor (caller, opts, ctx) {
@@ -88,10 +89,12 @@ class HttpFacility extends Base {
       })
 
       if (!resp.ok) {
-        httpErr = new Error(`ERR_HTTP: ${resp.status} - ${resp.statusText}`)
-        httpErr.status = resp.status
-        httpErr.statusText = resp.statusText
-        httpErr.headers = headers
+        httpErr = new HttpError(
+          `ERR_HTTP: ${resp.status} - ${resp.statusText}`,
+          resp.status,
+          resp.statusText,
+          headers
+        )
       }
 
       if (reqOpts.method !== 'head' && reqOpts.method !== 'options') {
