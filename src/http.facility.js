@@ -46,14 +46,15 @@ class HttpFacility extends Base {
 
       let url = path.includes('://') ? path : `${this.baseUrl}/${path.replace(/^\//, '')}`
 
-      const urlHasQuestion = url.includes('?')
-      if (this.qs) url += (urlHasQuestion ? '' : '?') + this.qs
-
       const reqOpts = _.pick(opts, ['body', 'headers', 'method', 'redirect', 'agent', 'compress', 'timeout', 'qs'])
+
+      let urlHasQParams = url.includes('?')
+      if (this.qs) {
+        url += (urlHasQParams ? '&' : '?') + this.qs
+        urlHasQParams = true
+      }
       if (reqOpts.qs) {
-        if (!urlHasQuestion) url += '?'
-        if (this.qs) url += '&'
-        url += new URLSearchParams(reqOpts.qs).toString()
+        url += (urlHasQParams ? '&' : '?') + new URLSearchParams(reqOpts.qs).toString()
       }
 
       if (!reqOpts.method) reqOpts.method = 'get'
