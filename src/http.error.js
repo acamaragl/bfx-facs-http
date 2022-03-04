@@ -1,5 +1,7 @@
 'use strict'
 
+const { format } = require('util')
+
 /**
  * User friendly error that is shown directly to endusers
  */
@@ -21,6 +23,7 @@ class HttpError extends Error {
     this.response = response
 
     Error.captureStackTrace(this, this.constructor)
+    this.stack = `${this.stack}\nHeaders: ${format(this.headers)}\nResponse: ${format(this.response)}`
   }
 
   /**

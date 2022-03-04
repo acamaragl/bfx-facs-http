@@ -56,7 +56,7 @@ describe('http facility tests', () => {
     })
   })
 
-  it('stack trace should print all http related details', () => {
+  it('error log should print all http related details', () => {
     const err = new HttpError(message, status, statusText, headers, response)
     console.error(err)
     const log = _last(logs)
@@ -66,5 +66,15 @@ describe('http facility tests', () => {
     expect(log.includes(statusText)).to.be.true()
     expect(log.includes(format(headers))).to.be.true()
     expect(log.includes(format(response))).to.be.true()
+  })
+
+  it('stack trace should print all http related details', () => {
+    const err = new HttpError(message, status, statusText, headers, response)
+
+    expect(err.stack.includes(`HttpError: ${message}`)).to.be.true()
+    expect(err.stack.includes(status)).to.be.true()
+    expect(err.stack.includes(statusText)).to.be.true()
+    expect(err.stack.includes(format(headers))).to.be.true()
+    expect(err.stack.includes(format(response))).to.be.true()
   })
 })
