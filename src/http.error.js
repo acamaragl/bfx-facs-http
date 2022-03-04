@@ -23,7 +23,13 @@ class HttpError extends Error {
     this.response = response
 
     Error.captureStackTrace(this, this.constructor)
-    this.stack = `${this.stack}\nHeaders: ${format(this.headers)}\nResponse: ${format(this.response)}`
+    const [errText, ...trace] = this.stack.split('\n')
+    this.stack = [
+      errText,
+      `Headers: ${format(this.headers)}`,
+      `Response: ${format(this.response)}`,
+      ...trace
+    ].join('\n')
   }
 
   /**
