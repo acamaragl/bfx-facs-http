@@ -23,13 +23,7 @@ class HttpError extends Error {
     this.response = response
 
     Error.captureStackTrace(this, this.constructor)
-    const [errText, ...trace] = this.stack.split('\n')
-    this.stack = [
-      errText,
-      `Headers: ${format(this.headers)}`,
-      `Response: ${format(this.response)}`,
-      ...trace
-    ].join('\n')
+    this._buildStackTrace()
   }
 
   /**
@@ -45,6 +39,21 @@ class HttpError extends Error {
       headers: this.headers,
       response: this.response
     }
+  }
+
+  setResponse (response) {
+    this.response = response
+    this._buildStackTrace()
+  }
+
+  _buildStackTrace () {
+    const [errText, ...trace] = this.stack.split('\n')
+    this.stack = [
+      errText,
+      `Response: ${format(this.response)}`,
+      `Headers: ${format(this.headers)}`,
+      ...trace.filter(line => !line.startsWith('Response') && !line.startsWith('Headers'))
+    ].join('\n')
   }
 }
 

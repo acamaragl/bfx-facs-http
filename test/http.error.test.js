@@ -77,4 +77,17 @@ describe('http facility tests', () => {
     expect(err.stack.includes(format(headers))).to.be.true()
     expect(err.stack.includes(format(response))).to.be.true()
   })
+
+  it('stack trace should be rebuild when response is set later', () => {
+    const err = new HttpError(message, status, statusText, headers)
+
+    expect(err.stack.includes(`HttpError: ${message}`)).to.be.true()
+    expect(err.stack.includes(status)).to.be.true()
+    expect(err.stack.includes(statusText)).to.be.true()
+    expect(err.stack.includes(format(headers))).to.be.true()
+    expect(err.stack.includes(format(response))).to.be.false()
+
+    err.setResponse(response)
+    expect(err.stack.includes(format(response))).to.be.true()
+  })
 })

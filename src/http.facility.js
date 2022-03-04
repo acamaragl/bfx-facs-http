@@ -119,7 +119,7 @@ class HttpFacility extends Base {
         }
       }
 
-      if (httpErr && respBody) httpErr.response = respBody
+      if (httpErr && respBody) httpErr.setResponse(respBody)
 
       return this._response(httpErr, respBody, headers, cb)
     } catch (err) {
