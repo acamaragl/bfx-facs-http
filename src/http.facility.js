@@ -47,7 +47,7 @@ class HttpFacility extends Base {
 
       let url = path.includes('://') ? path : `${this.baseUrl}/${path.replace(/^\//, '')}`
 
-      const reqOpts = _.pick(opts, ['body', 'headers', 'method', 'redirect', 'agent', 'compress', 'timeout', 'qs'])
+      const reqOpts = _.pick(opts, ['body', 'headers', 'method', 'redirect', 'agent', 'compress', 'timeout', 'qs', 'signal'])
 
       let urlHasQParams = url.includes('?')
       if (this.qs) {

@@ -41,6 +41,7 @@ Params:
                          if unsupported value is provided it will return buffer.
                          If value is `raw` then body stream is returned, useful for file downloads
     - `qs<(String|Array<String>|Object)?>` - Optional, query string params 
+    - `signal<AbortSignal?>` - Optional, abort controller signal
   - `cb<Function?>` - Optional callback function, if not provided call will be treated as promise
 
 Response:
@@ -79,14 +80,20 @@ fac.request('/data/store', (err) => {
 })
 
 // file download
-const eos = require('end-of-stream')
+const stream = require('stream')
 
 const { body: resp } = await fac.request('/file', { encoding: { res: 'raw' } }) // raw means return stream
 await new Promise((resolve, reject) => {
-  const writer = fs.createWriteStream(writefile)
-  eos(writer, (err) => err ? reject(err) : resolve())
-  resp.pipe(writer)
+  stream.pipeline(resp, fs.createWriteStream(writefile), (err) => err ? reject(err) : resolve())
 })
+
+// abort signal
+const abortController = new AbortController()
+setTimeout(() => {
+  abortController.abort()
+}, 1000)
+
+const { body: resp } = await fac.request('/data', { signal: abortController.signal })
 ```
 
 ### fac.get
