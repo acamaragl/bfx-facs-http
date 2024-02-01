@@ -3,7 +3,7 @@
 'use strict'
 
 const chai = require('chai')
-const endOfStream = require('end-of-stream')
+const stream = require('stream')
 const express = require('express')
 const fs = require('fs')
 const http = require('http')
@@ -342,9 +342,7 @@ describe('http facility tests', () => {
 
       const { body: resp } = await fac.request('/file', { encoding: { res: 'raw' } })
       await new Promise((resolve, reject) => {
-        const writer = fs.createWriteStream(writefile)
-        endOfStream(writer, (err) => err ? reject(err) : resolve())
-        resp.pipe(writer)
+        stream.pipeline(resp, fs.createWriteStream(writefile), (err) => err ? reject(err) : resolve())
       })
 
       expect(fs.existsSync(writefile)).to.be.true()
@@ -398,6 +396,19 @@ describe('http facility tests', () => {
 
       const resp = await fac.request('/foo/bar/no-basic-auth', { method: 'get' })
       expect(resp.body).to.eq('')
+    })
+
+    it('should support abort signals', async () => {
+      app.get('/foo/bar/signal', () => { })
+
+      const abortController = new AbortController()
+      setTimeout(() => {
+        abortController.abort()
+      }, 1000)
+
+      await expect(
+        fac.request('/foo/bar/signal', { method: 'get', timeout: 30000, signal: abortController.signal })
+      ).to.be.rejectedWith(/aborted/)
     })
   })
 
